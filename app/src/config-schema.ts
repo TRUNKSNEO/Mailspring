@@ -24,6 +24,16 @@ export default {
           },
         },
       },
+      appearance: {
+        type: 'object',
+        properties: {
+          useSystemAccent: {
+            type: 'boolean',
+            default: true,
+            title: localized('Use system accent color'),
+          },
+        },
+      },
       workspace: {
         type: 'object',
         properties: {
