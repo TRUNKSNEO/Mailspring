@@ -148,6 +148,9 @@ export default class Application extends EventEmitter {
     this.systemAccentWatcher.on('change', color => {
       this.windowManager.sendToAllWindows('system-accent-color-changed', {}, color);
     });
+    this.systemAccentWatcher.on('dark-mode-change', darkMode => {
+      this.windowManager.sendToAllWindows('system-dark-mode-changed', {}, darkMode);
+    });
     if (process.platform === 'darwin') {
       this.touchBar = new ApplicationTouchBar(resourcePath);
     }
@@ -609,8 +612,24 @@ export default class Application extends EventEmitter {
       return this.systemAccentWatcher ? this.systemAccentWatcher.getCurrent() : null;
     });
 
+    // Synchronous because ThemeManager needs the value during its constructor to
+    // pick the initial ui-light / ui-dark variant without a flash.
+    ipcMain.on('get-system-dark-mode-sync', event => {
+      event.returnValue = this.systemAccentWatcher
+        ? this.systemAccentWatcher.getDarkMode()
+        : false;
+    });
+
     ipcMain.on('encountered-theme-error', (event, { message, detail }) => {
       if (userResetTheme) return;
+
+      // showMessageBoxSync blocks the main process indefinitely in headless
+      // test environments (xvfb can't render or accept input), hanging the
+      // spec suite until the 20 minute CI timeout.
+      if (this.specMode) {
+        console.error(`${message}\n${detail}`);
+        return;
+      }
 
       const buttonIndex = dialog.showMessageBoxSync({
         type: 'warning',
