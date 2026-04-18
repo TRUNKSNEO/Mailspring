@@ -25,6 +25,7 @@ import { MailsyncProcess } from '../mailsync-process';
 import Config from '../config';
 import { registerQuickpreviewIPCHandlers } from './quickpreview-ipc';
 import {
+  handleWindowsToastXMLProtocolAction,
   registerNotificationIPCHandlers,
 } from './notification-ipc';
 import WindowsTaskbarManager from './windows-taskbar-manager';
@@ -935,7 +936,12 @@ export default class Application extends EventEmitter {
     if (parts.protocol === 'mailto:') {
       main.sendMessage('mailto', urlToOpen);
     } else if (parts.protocol === 'mailspring:') {
-      if (parts.host === 'open-inbox') {
+      // Handle notification action URLs from Windows toast notifications
+      // These URLs are triggered when users click buttons on Windows toast notifications
+      // since Windows toast XML with activationType="background" doesn't work reliably with Electron
+      if (parts.host.startsWith('notification-')) {
+        handleWindowsToastXMLProtocolAction(parts);
+      } else if (parts.host === 'open-inbox') {
         main.show();
         main.focus();
       } else if (parts.host === 'open-preferences') {
