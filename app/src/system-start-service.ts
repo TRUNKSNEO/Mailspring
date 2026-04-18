@@ -44,6 +44,9 @@ class SystemStartServiceDarwin extends SystemStartServiceBase {
   }
 
   _cleanupLegacyPlist() {
+    if (!process.env.HOME) {
+      return;
+    }
     const plistPath = path.join(
       process.env.HOME,
       'Library',
@@ -56,8 +59,8 @@ class SystemStartServiceDarwin extends SystemStartServiceBase {
 
 class SystemStartServiceWin32 extends SystemStartServiceBase {
   checkAvailability() {
-    return new Promise<boolean>((resolve) => {
-      fs.access(this._updateExePath(), fs.constants.R_OK, (err) => {
+    return new Promise<boolean>(resolve => {
+      fs.access(this._updateExePath(), fs.constants.R_OK, err => {
         resolve(!err);
       });
     });
@@ -68,7 +71,6 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
     const settings = app.getLoginItemSettings({
       path: this._updateExePath(),
       args: this._loginArgs(),
-      name: app.getName(),
     });
     return Promise.resolve(settings.openAtLogin as boolean);
   }
@@ -79,7 +81,6 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
       openAtLogin: true,
       path: this._updateExePath(),
       args: this._loginArgs(),
-      name: app.getName(),
     });
     this._cleanupLegacyShortcut();
   }
@@ -90,7 +91,6 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
       openAtLogin: false,
       path: this._updateExePath(),
       args: this._loginArgs(),
-      name: app.getName(),
     });
     this._cleanupLegacyShortcut();
   }
@@ -106,6 +106,9 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
   }
 
   _cleanupLegacyShortcut() {
+    if (!process.env.APPDATA) {
+      return;
+    }
     const shortcutPath = path.join(
       process.env.APPDATA,
       'Microsoft',
@@ -121,8 +124,8 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
 
 class SystemStartServiceLinux extends SystemStartServiceBase {
   checkAvailability() {
-    return new Promise<boolean>((resolve) => {
-      fs.access(this._launcherPath(), fs.constants.R_OK, (err) => {
+    return new Promise<boolean>(resolve => {
+      fs.access(this._launcherPath(), fs.constants.R_OK, err => {
         if (err) {
           resolve(false);
         } else {
@@ -133,8 +136,8 @@ class SystemStartServiceLinux extends SystemStartServiceBase {
   }
 
   doesLaunchOnSystemStart() {
-    return new Promise<boolean>((resolve) => {
-      fs.access(this._shortcutPath(), fs.constants.R_OK | fs.constants.W_OK, (err) => {
+    return new Promise<boolean>(resolve => {
+      fs.access(this._shortcutPath(), fs.constants.R_OK | fs.constants.W_OK, err => {
         if (err) {
           resolve(false);
         } else {
