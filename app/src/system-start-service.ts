@@ -82,7 +82,6 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
       path: this._updateExePath(),
       args: this._loginArgs(),
     });
-    this._cleanupLegacyShortcut();
   }
 
   dontLaunchOnSystemStart() {
@@ -92,7 +91,6 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
       path: this._updateExePath(),
       args: this._loginArgs(),
     });
-    this._cleanupLegacyShortcut();
   }
 
   _updateExePath() {
@@ -102,23 +100,7 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
 
   _loginArgs() {
     const exeName = path.basename(process.execPath);
-    return ['--processStart', `"${exeName}"`, '--process-start-args', `"--background"`];
-  }
-
-  _cleanupLegacyShortcut() {
-    if (!process.env.APPDATA) {
-      return;
-    }
-    const shortcutPath = path.join(
-      process.env.APPDATA,
-      'Microsoft',
-      'Windows',
-      'Start Menu',
-      'Programs',
-      'Startup',
-      'Mailspring.lnk'
-    );
-    fs.unlink(shortcutPath, () => {});
+    return ['--processStart', `${exeName}`, '--process-start-args', `"--background"`];
   }
 }
 

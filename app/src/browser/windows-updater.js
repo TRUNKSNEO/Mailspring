@@ -231,12 +231,13 @@ exports.registerAppUserModelId = registerAppUserModelId;
 // Windows can display a branded tile. Errors are ignored — these are optional.
 function copyVisualElements() {
   try {
-    const files = ['mailspring-75px.png', 'mailspring-150px.png', 'mailspring.VisualElementsManifest.xml'];
+    const files = [
+      'mailspring-75px.png',
+      'mailspring-150px.png',
+      'mailspring.VisualElementsManifest.xml',
+    ];
     for (const file of files) {
-      fs.copyFileSync(
-        path.join(appFolder, 'resources', file),
-        path.join(rootAppDataFolder, file)
-      );
+      fs.copyFileSync(path.join(appFolder, 'resources', file), path.join(rootAppDataFolder, file));
     }
   } catch (err) {
     // Ignore errors - visual elements are optional
