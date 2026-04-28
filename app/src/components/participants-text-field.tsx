@@ -40,7 +40,7 @@ TokenRenderer.propTypes = {
 type ParticipantsTextFieldProps = {
   field?: string;
   label?: string;
-  participants: { to: Contact[]; cc: Contact[]; bcc: Contact[] };
+  participants: { to: Contact[]; cc: Contact[]; bcc: Contact[]; replyTo: Contact[] };
   change: (...args: any[]) => any;
   className?: string;
   onEmptied?: (...args: any[]) => any;
